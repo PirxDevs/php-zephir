@@ -19,7 +19,7 @@ RUN \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN \
-    git clone --branch v1.8.0 --depth 1 https://github.com/zephir-lang/php-zephir-parser.git /usr/src/php-zephir-parser; \
+    git clone --branch v1.3.8 --depth 1 https://github.com/zephir-lang/php-zephir-parser.git /usr/src/php-zephir-parser; \
     cd /usr/src/php-zephir-parser; \
     phpize; \
     ./configure; \
