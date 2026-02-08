@@ -8,7 +8,7 @@ fi
 
 for phpVersion in ${phpVersions}; do
   pushd php-${phpVersion}-zephir
-  docker build -t php-${phpVersion}-zephir .
+  docker build --provenance=false -t php-${phpVersion}-zephir .
   docker tag php-${phpVersion}-zephir pirxdevs/php-zephir:$(docker run --rm  php-${phpVersion}-zephir php -r 'echo PHP_VERSION;')-$(docker version --format '{{.Server.Arch}}')
   popd
 done
