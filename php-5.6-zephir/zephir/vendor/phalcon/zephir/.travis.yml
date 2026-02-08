@@ -1,0 +1,103 @@
+sudo: false
+
+language: php
+php:
+  # - master
+  - '7.3'
+  - '7.2'
+  - '7.1'
+  - '7.0'
+  - '5.6'
+
+git:
+  depth: 1
+
+addons:
+  apt:
+    packages:
+    - gdb
+    - lcov
+
+env:
+  global:
+    - LD_LIBRARY_PATH="$TRAVIS_BUILD_DIR/build/lib":$LD_LIBRARY_PATH
+    - LIBRARY_PATH="$TRAVIS_BUILD_DIR/build/lib":$LIBRARY_PATH
+    - C_INCLUDE_PATH="$TRAVIS_BUILD_DIR/build/include"
+    - CFLAGS="-g3 -O0 -Wall -fvisibility=hidden"
+    - REPORT_EXIT_STATUS=1
+    - PATH="${HOME}/bin:${PATH}"
+    - RE2C_VERSION="1.1.1"
+    - ZEPHIR_PARSER_VERSION="v1.1.2"
+    - DEFAULT_ZFLAGS="-Wnonexistent-function -Wnonexistent-class -Wunused-variable"
+    - DEFAULT_COMPOSER_FLAGS="--no-interaction --no-ansi --no-progress --no-suggest"
+    - REPORT_COVERAGE=1
+
+matrix:
+  fast_finish: true
+  # allow_failures:
+    # There is still memory leaks
+    # and other issues like https://github.com/sebastianbergmann/phpunit/pull/3359
+    # - php: 'master'
+
+cache:
+  apt: true
+  ccache: true
+  timeout: 604800
+  directories:
+    - $HOME/.ccache
+    - $HOME/.composer/cache
+    - $HOME/.local/opt/re2c
+    - $HOME/.cache/re2c
+
+before_install:
+  - if [[ ! -z "${GH_TOKEN}" ]]; then composer config github-oauth.github.com ${GH_TOKEN}; echo "Configured Github token"; fi;
+  - export PHP_MAJOR="$(`phpenv which php` -r 'echo phpversion();' | cut -d '.' -f 1)"
+  - export PHP_MINOR="$(`phpenv which php` -r 'echo phpversion();' | cut -d '.' -f 2)"
+  - ulimit -c unlimited -S
+  - phpenv config-add ./unit-tests/ci/999-default.ini
+
+install:
+  - travis_retry composer install $DEFAULT_COMPOSER_FLAGS
+  - travis_retry gem install coveralls-lcov
+  - ./unit-tests/ci/install-re2c.sh $RE2C_VERSION
+  - ./unit-tests/ci/install-zephir-parser.sh
+  - ./install
+
+before_script:
+  - ./unit-tests/ci/install-test-ext.sh
+
+script:
+  - ./unit-tests/ci/run-unit-tests.sh
+
+jobs:
+  include:
+    - stage: Static Code Analysis
+      php: 7.2
+      script:
+        - vendor/bin/phpcs
+    - stage: Compiller testing
+      php: 7.2
+      compiler: clang
+      env:
+        - CC=clang
+        - REPORT_COVERAGE=0
+      before_script:
+        - ./unit-tests/ci/install-test-ext.sh
+      script:
+        - ./unit-tests/ci/run-unit-tests.sh
+    - stage: Benchmark
+      php: 7.2
+      before_script:
+        - ./unit-tests/ci/install-test-ext.sh
+      script:
+        - phpenv config-rm xdebug.ini || true
+        - $(phpenv which php) -d extension=ext/modules/test.so unit-tests/microbench.php
+
+after_success:
+  - ./unit-tests/ci/after-success.sh
+
+after_failure:
+  - ./unit-tests/ci/after-failure.sh
+
+notifications:
+  email: false

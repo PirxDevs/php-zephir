@@ -1,0 +1,63 @@
+{
+    "name": "phalcon/zephir",
+    "description": "Zephir is a compiled high level language aimed to the creation of C-extensions for PHP",
+    "keywords": [
+        "extension",
+        "zephir",
+        "phalcon",
+        "internals"
+    ],
+    "homepage": "https://zephir-lang.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Zephir Team",
+            "email": "team@zephir-lang.com",
+            "homepage": "https://zephir-lang.com"
+        },
+        {
+            "name": "Contributors",
+            "homepage": "https://github.com/phalcon/zephir/graphs/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.5",
+        "ext-ctype": "*",
+        "ext-hash": "*",
+        "ext-json": "*",
+        "ext-xml": "*",
+        "ext-mbstring": "*"
+    },
+    "require-dev": {
+        "ext-gmp": "*",
+        "ext-pdo": "*",
+        "ext-pdo_sqlite": "*",
+        "phpunit/phpunit": "^4.8 || ^5.7",
+        "squizlabs/php_codesniffer": "^3.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Zephir\\": "Library"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Zephir\\Stubs\\": "unit-tests/Zephir/Stubs/",
+            "Zephir\\Test\\": "unit-tests/Zephir/Test/",
+            "Zephir\\Support\\": "unit-tests/Zephir/Support/",
+            "Extension\\": "unit-tests/Extension/"
+        },
+        "classmap": [
+            "unit-tests/Data/"
+        ]
+    },
+    "bin": [
+        "bin/zephir"
+    ],
+    "support": {
+        "issues": "https://github.com/phalcon/zephir/issues?state=open",
+        "forum": "https://forum.zephir-lang.com",
+        "source": "https://github.com/phalcon/zephir",
+        "docs": "https://docs.zephir-lang.com"
+    }
+}
