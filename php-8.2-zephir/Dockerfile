@@ -21,7 +21,8 @@ RUN \
     cd /; \
     rm -rf /usr/src/php-zephir-parser
 
+COPY zephir.phar /usr/local/bin/
+
 RUN \
-    curl -sL -o /usr/local/bin/zephir.phar https://github.com/zephir-lang/zephir/releases/download/0.19.0/zephir.phar; \
     chmod +x /usr/local/bin/zephir.phar; \
     ln -s /usr/local/bin/zephir.phar /usr/local/bin/zephir
